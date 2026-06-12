@@ -14,13 +14,13 @@ gracefully to plain REST when MCP isn't connected.
 Any agent that supports Agent Skills (Claude Code, Codex, Cursor, Copilot, …):
 
 ```bash
-npx skills add getanyapi/skills
+npx skills add getanyapi-com/skills
 ```
 
 Claude Code, as a plugin (skill + MCP server in one step):
 
 ```bash
-claude plugin marketplace add getanyapi/skills
+claude plugin marketplace add getanyapi-com/skills
 claude plugin install anyapi@anyapi
 ```
 
