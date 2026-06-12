@@ -16,7 +16,7 @@ fails over across providers automatically under one price reservation).
 
 - Gateway: `https://api.getanyapi.com` (REST) and `https://api.getanyapi.com/mcp` (MCP, Streamable HTTP)
 - Dashboard (keys, wallet top-up): `https://app.getanyapi.com`
-- Docs: `https://docs.getanyapi.com`
+- Docs: `https://getanyapi.com/docs`
 
 ## Authentication
 

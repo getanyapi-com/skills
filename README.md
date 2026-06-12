@@ -5,7 +5,7 @@ hundreds of scraping and data APIs through one gateway: **one key, USD pay-per-r
 normalized schemas, automatic failover.**
 
 The skill teaches your agent the AnyAPI workflow (discover → inspect → run, cost
-discipline, error handling); the bundled [MCP server](https://docs.getanyapi.com/mcp)
+discipline, error handling); the bundled [MCP server](https://getanyapi.com/docs/mcp)
 gives it live, authenticated tools. They work together, and the skill degrades
 gracefully to plain REST when MCP isn't connected.
 
@@ -41,5 +41,5 @@ Manual: copy `skills/anyapi/` into your agent's skills directory
 
 ## Docs
 
-- [docs.getanyapi.com](https://docs.getanyapi.com) — quickstart, MCP server, API reference
+- [getanyapi.com/docs](https://getanyapi.com/docs) — quickstart, MCP server, API reference
 - [api.getanyapi.com/openapi.json](https://api.getanyapi.com/openapi.json) — machine-readable spec
