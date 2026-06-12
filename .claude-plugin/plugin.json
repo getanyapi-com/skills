@@ -1,0 +1,12 @@
+{
+  "name": "anyapi",
+  "description": "Hundreds of scraping and data APIs through one gateway: one key, USD pay-per-request, normalized schemas, automatic failover. Bundles the AnyAPI skill and MCP server.",
+  "version": "0.1.0",
+  "author": { "name": "AnyAPI", "email": "support@getanyapi.com", "url": "https://getanyapi.com" },
+  "homepage": "https://docs.getanyapi.com",
+  "repository": "https://github.com/getanyapi/skills",
+  "license": "Apache-2.0",
+  "keywords": ["scraping", "data", "api", "social-media", "search", "mcp"],
+  "skills": ["./skills/anyapi"],
+  "mcpServers": "./.mcp.json"
+}
