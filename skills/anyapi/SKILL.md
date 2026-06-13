@@ -45,8 +45,10 @@ over MCP works without a key; running an API always requires one.
    - MCP: `get_api` with `{"sku_id": "<sku>"}`.
    - REST: `curl -s "https://api.getanyapi.com/v1/apis/<sku>" -H "Authorization: Bearer $ANYAPI_API_KEY"`
 
-   The response includes `priceUsd` (per request), `inputSchema`, and
-   `outputSchema`. Build the input strictly from the schema's `required` and
+   The response includes `priceUsd`, `inputSchema`, and `outputSchema`. Most APIs
+   bill **per result returned** (`baseUsd + perItemUsd × items`) — set `limit` in
+   the input to cap how many results you get and what you pay; simple lookups are
+   flat per request. Build the input strictly from the schema's `required` and
    `properties` — invalid input is rejected without charge.
 
 3. **Run.**
