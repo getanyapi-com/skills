@@ -29,7 +29,7 @@ Manual: copy `skills/anyapi/` into your agent's skills directory
 
 ## Setup
 
-1. Create an API key at [app.getanyapi.com](https://app.getanyapi.com) and fund your
+1. Create an API key at [getanyapi.com/dashboard](https://getanyapi.com/dashboard) and fund your
    USD wallet.
 2. Export it: `export ANYAPI_API_KEY=...`
 
