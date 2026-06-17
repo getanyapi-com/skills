@@ -20,10 +20,37 @@ fails over across providers automatically under one price reservation).
 
 ## Authentication
 
-Use the customer's AnyAPI key from the `ANYAPI_API_KEY` environment variable.
-Never hardcode keys or print them. If no key is set, tell the user to create one
-at https://getanyapi.com/dashboard under **API keys** and fund the wallet. Discovery
-over MCP works without a key; running an API always requires one.
+Every run needs an AnyAPI key (an `aa_live_...` secret) in the `ANYAPI_API_KEY`
+environment variable, sent as `Authorization: Bearer $ANYAPI_API_KEY`. Discovery over
+MCP works without a key; running an API always requires one. Never hardcode or print the
+secret.
+
+**If `ANYAPI_API_KEY` is already set, use it.** Otherwise mint one right here — no
+dashboard trip, no sign-in:
+
+1. Ask the user which email address they want this AnyAPI account tied to.
+2. Mint a key with that email as the sponsor:
+
+   ```
+   curl -s -X POST https://api.getanyapi.com/agent/signup \
+     -H "Content-Type: application/json" \
+     -d '{ "sponsorEmail": "<their email>", "label": "<your tool or repo name>" }'
+   ```
+
+   The response returns `secret` (the `aa_live_...` key — shown once), `claimToken`, and
+   `expiresAt`. Put `secret` in `ANYAPI_API_KEY` and start working; it's seeded with a
+   small USD grant so calls succeed immediately. Keep the `claimToken`; never print the
+   `secret`.
+3. This starter key is **capped at a small amount and expires in 7 days** until it's
+   claimed. Tell the user how to upgrade it — claiming lifts the cap, makes it permanent,
+   and adds the one-time **$1** account credit:
+
+   > Sign in at https://getanyapi.com/dashboard with **<their email>**, open
+   > **API keys → Claim agent key**, and paste this token: `<claimToken>`
+
+   Claiming upgrades the *same* key already in `ANYAPI_API_KEY` and moves it onto the
+   user's funded wallet — nothing to swap. (If you passed `sponsorEmail`, that address
+   also gets an approve/block email.)
 
 ## Choosing a surface
 
@@ -106,9 +133,10 @@ None of these are charged:
 
 | MCP prefix / REST status | Meaning | What to do |
 |---|---|---|
-| `unauthorized` / 401 | Missing or invalid key | Check `ANYAPI_API_KEY`; have the user create a key |
+| `unauthorized` / 401 | Missing or invalid key | Check `ANYAPI_API_KEY`; mint one via self-signup (see Authentication) |
 | `sku_not_found` / 404 | Unknown SKU | Re-run discovery; don't guess slugs |
 | `invalid_input` / 400 | Input failed schema validation | Re-read the input schema and fix the payload |
+| `key_cap_exceeded` / 402 | Starter key hit its spend cap | Have the user claim the key (see Authentication) to uncap it |
 | `insufficient_credits` / 402 | Wallet too low | Ask the user to top up at getanyapi.com/dashboard |
 | `all_providers_failed` / 502 | Every provider errored | Transient; retry once after a pause, then report |
 | `no_providers` | SKU has no enabled providers | Report; pick another SKU |
