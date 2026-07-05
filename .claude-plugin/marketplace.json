@@ -2,14 +2,14 @@
   "name": "anyapi",
   "owner": { "name": "AnyAPI", "email": "support@getanyapi.com", "url": "https://getanyapi.com" },
   "metadata": {
-    "description": "Official AnyAPI plugin marketplace — agent access to hundreds of scraping and data APIs.",
+    "description": "Official AnyAPI plugin marketplace - agent access to hundreds of scraping and data APIs.",
     "version": "0.1.0"
   },
   "plugins": [
     {
       "name": "anyapi",
       "source": "./",
-      "description": "Hundreds of scraping and data APIs through one gateway: one key, USD pay-per-request, normalized schemas, automatic failover."
+      "description": "Hundreds of scraping and data APIs through one gateway: one key, USD pay-per-request, normalized schemas, automatic fallback."
     }
   ]
 }
