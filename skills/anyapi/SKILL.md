@@ -52,12 +52,13 @@ Command cheat sheet:
     anyapi search <query>
     anyapi list [--category]
     anyapi describe <sku>
-    anyapi run <sku> --input '<json>' [--fields a,b] [--max-items N] [--summary] [-o path] [--json]
+    anyapi run <sku> --input '<json>' [--jq <expr>] [--fields a,b] [--max-items N] [--summary] [-o path] [--json]
+    anyapi view [path] [--last [sku]] [--jq <expr>] [--fields a,b] [--max-items N] [--summary] [--json]
     anyapi balance
     anyapi claim
     anyapi init [--all] [--yes]
 
-By default, `anyapi run` writes the result to `.anyapi/<sku>-<timestamp>.json` and prints the path plus `costUsd`. Authentication lookup order is `--api-key` flag, `ANYAPI_API_KEY` env, `~/.anyapi/config.json`, then self-signup.
+`anyapi run` always saves the full result to `.anyapi/<sku>-<timestamp>.json` and prints the path plus `costUsd`; the shape flags trim stdout only, never the saved file. `anyapi view` (requires anyapi-cli >= 0.2.0) re-slices a saved result at zero cost - see section 4. Authentication lookup order is `--api-key` flag, `ANYAPI_API_KEY` env, `~/.anyapi/config.json`, then self-signup.
 
 Repo: https://github.com/getanyapi-com/cli
 
@@ -73,7 +74,8 @@ Authenticate with `Authorization: Bearer aa_live_...`. Tools exposed:
 
 - `list_apis` - discover APIs. Optional `query` and `category` filters. Token-light because schemas are omitted.
 - `get_api` - full definition of one API, including normalized input/output JSON Schema. Args: `sku_id`.
-- `run_api` - execute an API. Args: `sku_id`, `input` (object matching the input schema). Returns `output`, `provider` ("AnyAPI"), `costUsd`, and `items`. Supports the context-budget controls in section 4.
+- `run_api` - execute an API. Args: `sku_id`, `input` (object matching the input schema). Returns `output`, `provider` ("AnyAPI"), `costUsd`, `items`, and `resultId`. Supports the context-budget controls in section 4.
+- `read_result` - re-read a prior run's result for free. Args: `result_id` plus the same section 4 controls. Unbilled, ~15 min window.
 - `get_balance` - remaining wallet balance in USD for your key.
 
 ### Path C - Integrate into your app
@@ -123,6 +125,8 @@ An `AsyncAnyAPI` variant offers the same methods with `await`. Input keyword arg
       provider: "AnyAPI";
       costUsd: number;
       items?: number;
+      resultId?: string; // free re-read via GET /v1/results/{id} (section 4)
+      jqError?: string;  // set when a jq expression failed; output is then unshaped
     };
 
     export async function runAnyApi<TOutput>(
@@ -176,13 +180,26 @@ Other endpoints: `GET /apis` (list), `GET /apis/{sku}` (describe), `GET /balance
 
 ## 4. Context-budget controls (keep results from flooding your context)
 
-`run_api` returns the full normalized result by default. To return less, pass any of these (MCP: as fields on the tool input; REST: as query params on `/run/{sku}`; CLI: flags on `anyapi run`):
+Runs return the full normalized result by default. Four opt-in controls trim what reaches you; none change what you are charged (`costUsd` always reflects the full result the API produced). MCP: fields on `run_api` input. REST: query params on `/run/{sku}`. CLI: flags on `anyapi run`.
 
-- `fields` - comma-separated keys (dotted paths allowed) to keep on each result item. The biggest token saver: a page becomes a small object.
-- `max_items` - cap the number of result rows returned. A `_truncated` note reports how many were withheld so you can page via the API's own `limit`.
-- `summary` - return only a structural outline (top-level keys and array lengths), not the bulk data.
+**`jq` is the power tool.** A standard jq expression (same dialect as `gh api --jq`) runs against the `output` value (`{found, data}`); its result replaces `output` (multiple outputs become an array). Pick fields, slice long strings, and reshape in one pass. Example on `web.scrape` - keep the metadata plus only the first 3500 chars of markdown:
 
-These trim what is returned to you; they do **not** change what you are charged (`costUsd` reflects the full result the API produced).
+    MCP:  run_api  jq: ".data | {title, description, md: .markdown[:3500]}"
+    REST: POST /v1/run/web.scrape?jq=<url-encoded expression>
+    CLI:  anyapi run web.scrape --input '{"url":"..."}' --jq '.data | {title, description, md: .markdown[:3500]}'
+
+The simple options, applied before `jq`:
+
+- `fields` - comma-separated keys (dotted paths allowed) to keep on each result item.
+- `max_items` - cap the number of result rows returned. A `_truncated` note reports how many were withheld.
+- `summary` - structural outline only, including per-field byte sizes (`fieldBytes`). Peek first to see what is huge, then slice with `jq` or `fields`.
+
+**Never re-run just to reshape.** A billed result stays re-readable for free:
+
+- MCP / REST: the run response carries `resultId`. `read_result` / `GET /v1/results/{id}` accept the same four controls, unbilled, for ~15 min. To read the next chunk of a long string: `jq=.data.markdown[3500:7000]`.
+- CLI: the full result is already on disk in `.anyapi/`. `anyapi view --last web.scrape --jq '.data.markdown[3500:7000]'` re-slices it free, forever (anyapi-cli >= 0.2.0).
+
+On a bad `jq` expression you still get the full output plus a `jqError` field - the billed run is never wasted; fix the expression and use the free re-read, not a re-run.
 
 ## 5. Pricing
 
