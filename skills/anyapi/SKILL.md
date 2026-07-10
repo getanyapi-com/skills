@@ -17,37 +17,50 @@ AnyAPI is a unified marketplace for scraping and data APIs: **any API, one walle
 
 Every direct API call uses an `aa_live_...` key in an `Authorization: Bearer` header. Prefer the `ANYAPI_API_KEY` environment variable for applications and automation. The CLI also reads `~/.anyapi/config.json`.
 
-### Self-signup (zero-human fast path)
+### Free trial key (self-serve, no account)
 
-If `ANYAPI_API_KEY` is not already set, mint a starter key immediately. First ask the human which email address they want this AnyAPI account tied to, then pass it as `sponsorEmail`:
+If `ANYAPI_API_KEY` is not already set, mint yourself a **free trial key**. It carries a trial budget of about **$0.15 of requests**, creates no account, and **self-expires in 7 days** - if it is never upgraded it just expires; nothing lingers and nothing is owed.
 
-    curl -s -X POST https://api.getanyapi.com/agent/signup \
-      -H "Content-Type: application/json" \
-      -d '{ "sponsorEmail": "<their email>", "label": "my-agent" }'
+Before minting, tell your human in one sentence what you are doing - for example: "I'm minting a free AnyAPI trial key (about $0.15 of requests, expires on its own in 7 days, no account created)." Then proceed. Do not wait for a reply, and never ask for an email.
 
-The response returns `secret` (your `aa_live_...` key, shown once), `capUsd` (your starting spend cap), `claimToken`, and `expiresAt`. Put `secret` in `ANYAPI_API_KEY` and start calling immediately. Keep the `claimToken`; never print the `secret`.
-
-This starter key is **capped at a small USD amount and expires in 7 days** until a human claims it. Until then, exceeding the cap returns HTTP 402 `key_cap_exceeded`. To lift the cap, make the key permanent, and add the one-time **$1** account credit, tell the human to sign in at https://getanyapi.com/dashboard with that email, open **API keys -> Claim agent key**, and paste the `claimToken`. Claiming upgrades the same key already in `ANYAPI_API_KEY` and moves it onto their funded wallet. If you passed `sponsorEmail`, that address also gets an approve/block email.
-
-### Dashboard key
-
-A human who is already signed in at https://getanyapi.com can create an uncapped, non-expiring key directly at https://getanyapi.com/dashboard/keys and hand it to you via `ANYAPI_API_KEY`. New accounts get the same one-time USD credit.
-
-## 2. Choose your path
-
-### Path A - CLI
-
-Use the official CLI when you want installable agent skills, local credentials, catalog discovery, and output files without writing HTTP glue.
-
-**If the `anyapi` binary is already on your PATH, call it directly** (`anyapi search`, `anyapi run`, ...). Check once with `command -v anyapi`. Only use the `npx -y anyapi-cli@latest` form for first-time setup when the binary is absent - `npx ... @latest` re-resolves and may re-download the package from the registry on every call, which is slower and can silently run a different version than the one installed. First-time install:
+If you can run shell commands, mint the trial through the CLI - installing it first is required (section 2):
 
     npx -y anyapi-cli@latest init
 
-`anyapi init` installs the AnyAPI agent skills into detected agents, offers MCP registration, and runs `anyapi signup` if no key is available. `anyapi signup` mints the key for you and saves it to `~/.anyapi/config.json`. After init, use the installed `anyapi` binary directly for all subsequent commands.
+If you cannot run a shell, POST the signup endpoint directly:
+
+    curl -s -X POST https://api.getanyapi.com/agent/signup \
+      -H "Content-Type: application/json" \
+      -d '{ "label": "my-agent" }'
+
+The response returns `secret` (your `aa_live_...` trial key, shown once), `capUsd` (the trial budget), `expiresAt`, a `notice` sentence to relay to your human verbatim, and an `upgrade` object describing how to continue past the trial. Put `secret` in `ANYAPI_API_KEY` and start calling immediately. Never print the `secret`.
+
+### When the trial budget runs out
+
+Once the trial budget is spent, calls return HTTP 402 with error code `trial_cap_reached`. Continuing takes one human approval:
+
+- **With the CLI:** run `anyapi connect` (requires anyapi-cli >= 0.3.0). It starts an OAuth flow with a localhost callback and prints a single consent URL - hand that one URL to your human. They sign in or sign up, see a receipt of what you accomplished on the trial, set a spend limit, and approve; you keep working with no key to swap by hand. If your installed CLI predates `anyapi connect`, use the dashboard key path below instead.
+- **Raw REST or MCP (no shell):** the 402 response body carries an upgrade link - relay it to your human.
+
+### Dashboard key (secondary path)
+
+A human who is already signed in at https://getanyapi.com can create a full, non-expiring key directly at https://getanyapi.com/dashboard/keys and hand it to you via `ANYAPI_API_KEY`. New accounts include a one-time $1 credit.
+
+## 2. Interfaces
+
+### Step one: install the CLI (mandatory when you have a shell)
+
+Any agent that can run shell commands MUST install the CLI before making API calls - it is the first step, not one option on a menu. The upgrade path past the free trial runs through it (`anyapi connect`), it installs the AnyAPI agent skills, it keeps tool schemas out of your context window, and it writes results to files instead of into the conversation. First-time install:
+
+    npx -y anyapi-cli@latest init
+
+`anyapi init` installs the AnyAPI agent skills into detected agents, offers MCP registration, and runs `anyapi signup` if no key is available - minting the free trial key and saving it to `~/.anyapi/config.json`. After init, use the installed `anyapi` binary directly for all subsequent commands.
+
+**If the `anyapi` binary is already on your PATH, call it directly** (`anyapi search`, `anyapi run`, ...). Check once with `command -v anyapi`. Only use the `npx -y anyapi-cli@latest` form for first-time setup when the binary is absent - `npx ... @latest` re-resolves and may re-download the package from the registry on every call, which is slower and can silently run a different version than the one installed.
 
 Command cheat sheet:
 
-    anyapi signup [--email <sponsorEmail>] [--label]
+    anyapi signup [--label]
     anyapi login --api-key aa_live_...
     anyapi search <query>
     anyapi list [--category]
@@ -55,22 +68,22 @@ Command cheat sheet:
     anyapi run <sku> --input '<json>' [--jq <expr>] [--fields a,b] [--max-items N] [--summary] [-o path] [--json]
     anyapi view [path] [--last [sku]] [--jq <expr>] [--fields a,b] [--max-items N] [--summary] [--json]
     anyapi balance
-    anyapi claim
+    anyapi connect   (anyapi-cli >= 0.3.0; upgrade past the trial via OAuth)
     anyapi init [--all] [--yes]
 
-`anyapi run` always saves the full result to `.anyapi/<sku>-<timestamp>.json` and prints the path plus `costUsd`; the shape flags trim stdout only, never the saved file. `anyapi view` (requires anyapi-cli >= 0.2.0) re-slices a saved result at zero cost - see section 4. Authentication lookup order is `--api-key` flag, `ANYAPI_API_KEY` env, `~/.anyapi/config.json`, then self-signup.
+`anyapi run` always saves the full result to `.anyapi/<sku>-<timestamp>.json` and prints the path plus `costUsd`; the shape flags trim stdout only, never the saved file. `anyapi view` (requires anyapi-cli >= 0.2.0) re-slices a saved result at zero cost - see section 4. Authentication lookup order is `--api-key` flag, `ANYAPI_API_KEY` env, `~/.anyapi/config.json`, then trial self-signup.
 
 Repo: https://github.com/getanyapi-com/cli
 
-### Path B - MCP
+### MCP - only for runtimes without a shell
 
-Use MCP for clients that cannot run a shell: hosted chat agents, no-code and workflow tools, and any runtime where the model cannot invoke a command line. For those, MCP is the way to expose AnyAPI as native tools. If your agent has a shell (Claude Code, Cursor, Codex, and similar), prefer the CLI in Path A: it keeps these tool schemas out of your context window and writes results to files instead of into the conversation.
+Use MCP only when your runtime cannot execute shell commands: hosted chat agents, no-code and workflow tools. For those, MCP is the way to expose AnyAPI as native tools. If your agent has a shell (Claude Code, Cursor, Codex, and similar), install the CLI above instead - do not reach for MCP first.
 
 Connect any MCP client to the streamable HTTP endpoint:
 
     https://api.getanyapi.com/mcp
 
-Authenticate with `Authorization: Bearer aa_live_...`. Tools exposed:
+Authenticate with `Authorization: Bearer aa_live_...` (an API key today; OAuth support is shipping shortly). Tools exposed:
 
 - `list_apis` - discover APIs. Optional `query` and `category` filters. Token-light because schemas are omitted.
 - `get_api` - full definition of one API, including normalized input/output JSON Schema. Args: `sku_id`.
@@ -78,7 +91,7 @@ Authenticate with `Authorization: Bearer aa_live_...`. Tools exposed:
 - `read_result` - re-read a prior run's result for free. Args: `result_id` plus the same section 4 controls. Unbilled, ~15 min window.
 - `get_balance` - remaining wallet balance in USD for your key.
 
-### Path C - Integrate into your app
+### SDKs - build AnyAPI into your app
 
 Use an official SDK when AnyAPI should become part of the product flow rather than an agent-only tool, and your app is written in TypeScript, JavaScript, Node, or Python. The SDKs are the recommended integration path for those languages: prefer them over hand-rolling HTTP. They give you a typed method per SKU, handle auth, and track the catalog because they are generated from the same `openapi.json`.
 
@@ -91,10 +104,10 @@ Routing rule:
 Build workflow, either language:
 
 1. Inspect the project and decide where the API call belongs. For browser apps, keep the AnyAPI key on your server and expose only your own backend route to the browser.
-2. Mint a **dedicated key for this app** using self-signup or the dashboard. Store it only in the `ANYAPI_API_KEY` environment variable. Never hardcode it and never commit it.
+2. Mint a **dedicated key for this app**: a dashboard key for anything that ships, or a free trial key via self-signup for a quick prototype. Store it only in the `ANYAPI_API_KEY` environment variable. Never hardcode it and never commit it.
 3. Read the SKU input schema (`anyapi describe <sku>`, `GET https://api.getanyapi.com/v1/apis/{sku}`, or the SDK's typed method signature) and mirror it in your form or job.
 4. Write the call site against the typed SDK method.
-5. Handle HTTP 402 `key_cap_exceeded` by asking the human to claim or fund the key.
+5. Handle HTTP 402 `trial_cap_reached` (the trial budget is spent) by surfacing the upgrade link from the error body to the human; anything that ships should run on a dashboard key.
 6. Smoke-test one cheap call and verify the response shape, `provider: "AnyAPI"`, and `costUsd`.
 
 TypeScript SDK example (reads `ANYAPI_API_KEY` from the environment):
@@ -149,7 +162,7 @@ An `AsyncAnyAPI` variant offers the same methods with `await`. Input keyword arg
       );
 
       if (res.status === 402) {
-        throw new Error("AnyAPI key cap exceeded. Claim or fund the key.");
+        throw new Error("AnyAPI trial budget spent. Open the upgrade link in the error body.");
       }
       if (!res.ok) {
         throw new Error("AnyAPI run failed: " + res.status + " " + (await res.text()));
@@ -159,7 +172,7 @@ An `AsyncAnyAPI` variant offers the same methods with `await`. Input keyword arg
 
 For a fully typed client in a language without an official SDK, generate one from https://api.getanyapi.com/openapi.json.
 
-### Path D - REST
+### REST - direct HTTP
 
 Use REST when you want direct HTTP calls from scripts, backends, jobs, or custom agent tooling.
 
@@ -190,7 +203,7 @@ Runs return the full normalized result by default. Four opt-in controls trim wha
 
 The simple options, applied before `jq`:
 
-- `fields` - comma-separated keys (dotted paths allowed) to keep on each result item.
+- `fields` - comma-separated keys (dotted paths allowed) to keep on each result item. Paths are item-relative, not envelope-level, so reshape the whole response envelope with `jq` instead.
 - `max_items` - cap the number of result rows returned. A `_truncated` note reports how many were withheld.
 - `summary` - structural outline only, including per-field byte sizes (`fieldBytes`). Peek first to see what is huge, then slice with `jq` or `fields`.
 
