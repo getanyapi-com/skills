@@ -4,7 +4,7 @@ description: Accesses hundreds of scraping and data APIs (social media, search r
 license: Apache-2.0
 metadata:
   author: AnyAPI
-  version: "0.2.2"
+  version: "0.3.0"
 ---
 
 # AnyAPI - agent onboarding
@@ -77,19 +77,25 @@ Repo: https://github.com/getanyapi-com/cli
 
 ### MCP - only for runtimes without a shell
 
-Use MCP only when your runtime cannot execute shell commands: hosted chat agents, no-code and workflow tools. For those, MCP is the way to expose AnyAPI as native tools. If your agent has a shell (Claude Code, Cursor, Codex, and similar), install the CLI above instead - do not reach for MCP first.
+Use MCP only when your runtime cannot execute shell commands: hosted Claude, ChatGPT, no-code, and workflow tools. For those, MCP is the way to expose AnyAPI as native tools. If your agent has a shell (Claude Code, Cursor, Codex, and similar), install the CLI above first.
 
 Connect any MCP client to the streamable HTTP endpoint:
 
     https://api.getanyapi.com/mcp
 
-Authenticate with `Authorization: Bearer aa_live_...` (an API key today; OAuth support is shipping shortly). Tools exposed:
+For hosted Claude and ChatGPT, configure the URL only and complete OAuth sign-in and consent when prompted. Do not add headers. For clients that cannot do OAuth, use `Authorization: Bearer aa_live_...` as the fallback. Tools exposed:
 
 - `list_apis` - discover APIs. Optional `query` and `category` filters. Token-light because schemas are omitted.
+- `search_apis` - find APIs by keyword. Args: `query`, optional `category` and `limit`.
 - `get_api` - full definition of one API, including normalized input/output JSON Schema. Args: `sku_id`.
+- `quote_api` - estimate the USD cost of a call without executing it. Args: `sku_id`, `input`.
 - `run_api` - execute an API. Args: `sku_id`, `input` (object matching the input schema). Returns `output`, `provider` ("AnyAPI"), `costUsd`, `items`, and `resultId`. Supports the context-budget controls in section 4.
 - `read_result` - re-read a prior run's result for free. Args: `result_id` plus the same section 4 controls. Unbilled, ~15 min window.
 - `get_balance` - remaining wallet balance in USD for your key.
+
+The MCP endpoint requires authentication for every tool, including `list_apis`, `search_apis`, and
+`get_api`. OAuth-capable hosted clients authenticate through the URL-only connection; use a Bearer
+API key only as a fallback for clients that cannot do OAuth.
 
 ### SDKs - build AnyAPI into your app
 

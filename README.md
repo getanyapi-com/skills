@@ -4,7 +4,7 @@ Official [Agent Skills](https://agentskills.io) for [AnyAPI](https://getanyapi.c
 hundreds of scraping and data APIs through one gateway: **one key, USD pay-per-request,
 normalized schemas, automatic fallback.**
 
-The skills teach your agent the AnyAPI workflow (discover -> inspect -> run, cost
+The skills teach your agent the AnyAPI workflow (discover -> inspect -> quote -> run, cost
 discipline, error handling); the bundled [MCP server](https://getanyapi.com/docs/mcp-server)
 gives it live, authenticated tools. They work together, and the skill degrades
 gracefully to plain REST when MCP isn't connected.
@@ -44,8 +44,9 @@ For local agent use, run:
 npx -y anyapi-cli@latest init
 ```
 
-For application code, create or claim a dedicated key and expose it only as an environment
-variable:
+For hosted Claude or ChatGPT, connect the remote MCP URL only and complete OAuth sign-in and
+consent. For local shell agents, use the CLI first. For application code or clients without OAuth,
+create or claim a dedicated key and expose it only as an environment variable:
 
 ```bash
 export ANYAPI_API_KEY=...
