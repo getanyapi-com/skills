@@ -56,7 +56,9 @@ export ANYAPI_API_KEY=...
 | Skill | What it does |
 |---|---|
 | [`anyapi`](skills/anyapi/SKILL.md) | Discover, inspect, and run any API in the catalog; pricing and error semantics |
-| [`anyapi-build`](skills/anyapi-build/SKILL.md) | Integrate AnyAPI into an app backend, mirror schemas, handle 402s, and smoke-test the call |
+
+Application-integration guidance is part of the canonical `anyapi` skill; there is no separate
+`anyapi-build` skill.
 
 ## Docs
 

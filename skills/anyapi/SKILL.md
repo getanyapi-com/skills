@@ -44,7 +44,7 @@ Once the trial budget is spent, calls return HTTP 402 with error code `trial_cap
 
 ### Dashboard key (secondary path)
 
-A human who is already signed in at https://getanyapi.com can create a full, non-expiring key directly at https://getanyapi.com/dashboard/keys and hand it to you via `ANYAPI_API_KEY`. New accounts start with $0.15 free and can verify a phone number to unlock $1 more.
+A human who is already signed in at https://getanyapi.com can create a full, non-expiring key directly at https://getanyapi.com/dashboard/keys and hand it to you via `ANYAPI_API_KEY`. New accounts start with $1 free, unlocked after a quick phone verification.
 
 ## 2. Interfaces
 
