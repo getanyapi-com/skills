@@ -85,7 +85,7 @@ Connect any MCP client to the streamable HTTP endpoint:
 
 Hosted OAuth is the primary connection. For non-OAuth clients, authenticate with `Authorization: Bearer aa_live_...`. Tools exposed:
 
-- `list_apis` - browse APIs, optionally filtered by `category`. Returns identity and nested USD pricing; descriptions, lanes, health, and schemas are omitted.
+- `list_apis` - browse APIs, optionally filtered by `category`. Returns identity, nested USD pricing, and `failover`; descriptions, lanes, health, and schemas are omitted.
 - `search_apis` - ranked search across name, slug, and description. Requires `query`; optional `category`, `platform`, and `limit`. Adds descriptions and relevance to the list fields; lanes, health, and schemas are omitted.
 - `get_api` - full definition of one API, including nested USD pricing, anonymous lanes, and normalized input/output JSON Schema. Args: `sku_id`.
 - `quote_api` - price a `run_api` call before running it. Free, no key required, nothing charged or executed; also validates your input against the schema. Args: `sku_id`, `input` (the same you would pass `run_api`). Returns `maxCostUsd`, `minCostUsd`, and the base/per-item breakdown.
@@ -219,7 +219,9 @@ On a bad `jq` expression you still get the full output plus a `jqError` field - 
 
 ## 5. Pricing
 
-Every price is in **USD**. Static discovery returns a nested `pricing` object. `pricing.from` is the cheapest complete offer; `pricing.failoverMaxUsd` is the greatest fallback ceiling. A flat offer is `{model: "flat", unit: "request", maxUsd}`. A linear offer is `{model: "linear", unit, baseUsd, perUnitUsd, maxUsd}`, where `unit` names the billable result or submitted input. Use `quote_api` when the exact price depends on the intended input. You are never billed in "credits".
+Every price is in **USD**. Static discovery returns a nested `pricing` object. `pricing.from` is the complete published offer for the first customer-routable lane, and `pricing.failoverMaxUsd` is the published greatest fallback ceiling. A flat offer is `{model: "flat", unit: "request", maxUsd}`. A linear offer is `{model: "linear", unit, baseUsd, perUnitUsd, maxUsd}`, where `unit` names the billable result or submitted input. Use these fields directly: do not select a different lane price or recompute the ceiling. Use `quote_api` when the exact price depends on the intended input. You are never billed in "credits".
+
+Every discovery response also carries the gateway-authoritative `failover` fact: `true` means a failed attempt can be retried on another lane automatically. `false` means no automatic fallback is available today. Consume this field directly and never infer it from the number of lanes. Failed attempts are never billed either way.
 
 ## 6. Docs
 
