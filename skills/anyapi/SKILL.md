@@ -15,7 +15,7 @@ AnyAPI is a unified marketplace for scraping and data APIs: **any API, one walle
 
 ## 1. Get credentials
 
-Every direct API call uses an `aa_live_...` key in an `Authorization: Bearer` header. Prefer the `ANYAPI_API_KEY` environment variable for applications and automation. The CLI also reads `~/.anyapi/config.json`.
+Every direct API call uses a Bearer credential: an `aa_live_...` API key or an `aa_at_...` OAuth access token. Prefer the `ANYAPI_API_KEY` environment variable for applications and automation. The CLI also reads `~/.anyapi/config.json`.
 
 ### Free trial key (self-serve, no account)
 
@@ -42,9 +42,13 @@ Once the trial budget is spent, calls return HTTP 402 with error code `trial_cap
 - **With the CLI:** run `anyapi connect` (requires anyapi-cli >= 0.3.0). It starts an OAuth flow with a localhost callback and prints a single consent URL - hand that one URL to your human. They sign in or sign up, see a receipt of what you accomplished on the trial, set a spend limit, and approve; you keep working with no key to swap by hand. If your installed CLI predates `anyapi connect`, use the dashboard key path below instead.
 - **Raw REST or MCP (no shell):** the 402 response body carries an upgrade link - relay it to your human.
 
+### Immediate account sign-in (cross-device)
+
+Run `anyapi login` to sign in to an AnyAPI account immediately instead of starting or upgrading a trial. The CLI uses the OAuth device flow: it prints a verification URL and user code, opens the complete URL when possible, and waits for approval without binding a localhost callback. The human can approve from any browser or device. The CLI saves and automatically refreshes the account session.
+
 ### Dashboard key (secondary path)
 
-A human who is already signed in at https://getanyapi.com can create a full, non-expiring key directly at https://getanyapi.com/dashboard/keys and hand it to you via `ANYAPI_API_KEY`. New accounts start with $1 free, unlocked after a quick phone verification.
+A human who is already signed in at https://getanyapi.com can create a full, non-expiring key directly at https://getanyapi.com/dashboard/keys and hand it to you via `ANYAPI_API_KEY`, or you can store it locally with `anyapi login --api-key aa_live_...`. New accounts start with $1 free, unlocked after a quick phone verification.
 
 ## 2. Interfaces
 
@@ -61,6 +65,7 @@ Any agent that can run shell commands MUST install the CLI before making API cal
 Command cheat sheet:
 
     anyapi signup [--label]
+    anyapi login   (cross-device OAuth account sign-in)
     anyapi login --api-key aa_live_...
     anyapi search <query>
     anyapi list [--category]
