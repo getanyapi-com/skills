@@ -19,9 +19,9 @@ Every direct API call uses a Bearer credential: an `aa_live_...` API key or an `
 
 ### Free trial key (self-serve, no account)
 
-If `ANYAPI_API_KEY` is not already set, mint yourself a **free trial key**. It carries a trial budget of about **$0.15 of requests**, creates no account, and **self-expires in 7 days** - if it is never upgraded it just expires; nothing lingers and nothing is owed.
+If `ANYAPI_API_KEY` is not already set, mint yourself a **free trial key**. It carries a trial budget of about **$0.05 of requests**, creates no account, and **self-expires in 7 days** - if it is never upgraded it just expires; nothing lingers and nothing is owed.
 
-Before minting, tell your human in one sentence what you are doing - for example: "I'm minting a free AnyAPI trial key (about $0.15 of requests, expires on its own in 7 days, no account created)." Then proceed. Do not wait for a reply, and never ask for an email.
+Before minting, tell your human in one sentence what you are doing - for example: "I'm minting a free AnyAPI trial key (about $0.05 of requests, expires on its own in 7 days, no account created)." Then proceed. Do not wait for a reply, and never ask for an email.
 
 If you can run shell commands, mint the trial through the CLI - installing it first is required (section 2):
 
@@ -48,7 +48,7 @@ Run `anyapi login` to sign in to an AnyAPI account immediately instead of starti
 
 ### Dashboard key (secondary path)
 
-A human who is already signed in at https://getanyapi.com can create a full, non-expiring key directly at https://getanyapi.com/dashboard/keys and hand it to you via `ANYAPI_API_KEY`, or you can store it locally with `anyapi login --api-key aa_live_...`. New accounts start with $1 free, unlocked after a quick phone verification.
+A human who is already signed in at https://getanyapi.com can create a full, non-expiring key directly at https://getanyapi.com/dashboard/keys and hand it to you via `ANYAPI_API_KEY`, or you can store it locally with `anyapi login --api-key aa_live_...`. New accounts get $0.10 of credit, no card required. That covers about 100 requests on our cheapest APIs like Google Search and X.
 
 ## 2. Interfaces
 
@@ -94,7 +94,8 @@ Hosted OAuth is the primary connection. For non-OAuth clients, authenticate with
 - `search_apis` - ranked search across name, slug, and description. Requires `query`; optional `category`, `platform`, and `limit`. Adds descriptions and relevance to the list fields; lanes, health, and schemas are omitted.
 - `get_api` - full definition of one API, including nested USD pricing, anonymous lanes, and normalized input/output JSON Schema. Args: `sku_id`.
 - `quote_api` - price a `run_api` call before running it. Free, no key required, nothing charged or executed; also validates your input against the schema. Args: `sku_id`, `input` (the same you would pass `run_api`). Returns `maxCostUsd`, `minCostUsd`, and the base/per-item breakdown.
-- `run_api` - execute an API. Args: `sku_id`, `input` (object matching the input schema). Returns `output`, `provider` ("AnyAPI"), `costUsd`, `items`, and `resultId`. Supports the context-budget controls in section 4.
+- `run_api` - execute an API. Args: `sku_id`, `input` (object matching the input schema). Ordinary APIs return `output`, `provider` ("AnyAPI"), `costUsd`, `items`, and `resultId`. A durable API waits briefly, then may return `requestId`, `status`, and a machine-actionable `nextAction`; follow it instead of repeating the paid call. Supports the context-budget controls in section 4.
+- `get_request` - inspect/resume a durable request without repeating or re-paying for the provider dispatch. Args: `request_id`. Poll after `retryAfterSeconds` while queued/running.
 - `read_result` - re-read a prior run's result for free. Args: `result_id` plus the same section 4 controls. Unbilled, ~15 min window.
 - `get_balance` - remaining wallet balance in USD for your key.
 
@@ -190,6 +191,8 @@ Base URL `https://api.getanyapi.com/v1`, Bearer auth on every request.
       -H "Content-Type: application/json" \
       -d '{ ...input matching the API schema... }'
 
+Provider-job APIs require a unique `Idempotency-Key`. They wait 10 seconds by default; use `Prefer: respond-async` for immediate acceptance or `Prefer: wait=N` (maximum 90 seconds). A `202 Accepted` returns a durable `requestId`, `Location`, and `Retry-After`: poll `GET /requests/{requestId}` and never repeat the paid POST. Successful output is retrievable there for 24 hours; request metadata remains after `resultExpired: true`. These async APIs require an authenticated wallet and are unavailable through x402, MPP, and anonymous/public-tool payment.
+
 Other endpoints: `GET /apis?category=...` (browse), `GET /apis/{sku}` (describe), `GET /balance`. Ranked public search is `GET /catalog/search?q=...`; the public browse catalog (no auth) is at https://api.getanyapi.com/catalog. A typed OpenAPI document is at https://api.getanyapi.com/openapi.json.
 
 ## 3. The call loop
@@ -197,7 +200,7 @@ Other endpoints: `GET /apis?category=...` (browse), `GET /apis/{sku}` (describe)
 1. Use `search_apis` to find a SKU by intent, or `list_apis` to browse by category.
 2. `get_api` to read its input/output schema.
 3. `quote_api` (optional) with the same `sku_id` and `input` to see the exact price and validate your input before charging - free, nothing runs.
-4. `run_api` with input that matches the schema. On a schema mismatch you get the fields and an example back so you can self-correct without another round-trip, with no charge. `costUsd` and `items` tell you what you paid and received.
+4. `run_api` with input that matches the schema. On a schema mismatch you get the fields and an example back so you can self-correct without another round-trip, with no charge. If it returns `nextAction`, call `get_request` after the requested delay; do not submit the run again. Terminal `costUsd` and `items` tell you what you paid and received.
 
 ## 4. Context-budget controls (keep results from flooding your context)
 
