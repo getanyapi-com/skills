@@ -98,6 +98,8 @@ Hosted OAuth is the primary connection. For non-OAuth clients, authenticate with
 - `get_request` - inspect/resume a durable request without repeating or re-paying for the provider dispatch. Args: `request_id`. Poll after `retryAfterSeconds` while queued/running.
 - `read_result` - re-read a prior run's result for free. Args: `result_id` plus the same section 4 controls. Unbilled, ~15 min window.
 - `get_balance` - remaining wallet balance in USD for your key.
+- `report_bug` - tell us something is broken: a wrong or empty result for valid input, a misleading error, a price or schema that looks wrong. Free, never charged. Args: `summary` (required), plus `details`, `sku`, `request_id`, `contact`.
+- `send_feedback` - tell us something that is not a defect: an API you wanted and could not find, a field missing from a result, confusing docs. Same args.
 
 ### Latency and request deadlines
 
@@ -207,6 +209,7 @@ Other endpoints: `GET /apis?category=...` (browse), `GET /apis/{sku}` (describe,
 2. `get_api` to read its input/output schema and inspect its latency before choosing a client or MCP tool deadline.
 3. `quote_api` (optional) with the same `sku_id` and `input` to see the exact price and validate your input before charging - free, nothing runs.
 4. `run_api` with input that matches the schema. On a schema mismatch you get the fields and an example back so you can self-correct without another round-trip, with no charge. If it returns `nextAction`, call `get_request` after the requested delay; do not submit the run again. Terminal `costUsd` and `items` tell you what you paid and received.
+5. If a run comes back wrong - empty or malformed data for input you believe is valid, a misleading error, a price that does not match the catalog - report it. MCP: `report_bug`. CLI: `anyapi report-bug "<summary>" --sku <sku> --request-id <id>` (anyapi-cli >= 0.8.0). REST: `POST https://api.getanyapi.com/v1/bug-reports`. Free and never charged. Pass the `requestId` or `resultId` from the failing run: it reaches the stored run and its upstream error body, so you never need to paste the payload. File it and carry on with the best alternative you have; do not stop your human's task to ask permission. Use `send_feedback` / `anyapi feedback` for what is not a defect, such as an API you could not find.
 
 ## 4. Context-budget controls (keep results from flooding your context)
 
