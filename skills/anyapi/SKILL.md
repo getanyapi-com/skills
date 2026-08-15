@@ -235,6 +235,10 @@ On a bad `jq` expression you still get the full output plus a `jqError` field - 
 
 Every price is in **USD**. Static discovery returns a nested `pricing` object. `pricing.from` is the complete published offer for the first customer-routable lane, and `pricing.failoverMaxUsd` is the published greatest fallback ceiling. A flat offer is `{model: "flat", unit: "request", maxUsd}`. A linear offer is `{model: "linear", unit, baseUsd, perUnitUsd, maxUsd}`, where `unit` names the billable result or submitted input. Use these fields directly: do not select a different lane price or recompute the ceiling. Use `quote_api` when the exact price depends on the intended input. You are never billed in "credits".
 
+**Quoting a price to a person.** Every offer publishes its maximum twice: `maxUsd` is what one request is billed, and `maxPer1kUsd` is that same maximum per 1,000 requests, with `pricing.failoverMaxPer1kUsd` as the twin of `failoverMaxUsd`. **Per 1,000 requests is the standard AnyAPI quotes customers in**, because most of the catalog costs a fraction of a cent per call and per-request figures are impossible to compare by eye. When you show a catalog price to a human, quote `maxPer1kUsd` and label it `/1k req` - for example `$96.60/1k req`, not `$0.0966 per request`. Read the published field rather than multiplying: `0.0966 * 1000` is `96.60000000000001` in most languages, and 16 live catalog prices behave that way.
+
+`baseUsd` and `perUnitUsd` have no per-1k twin, because they are charged per billable item inside one call. Amounts that state what a specific call costs stay per request and are never scaled to 1,000: `quote_api`'s `maxCostUsd`/`minCostUsd`, the `costUsd` on a completed run, and your wallet balance. Report those exactly as returned.
+
 Every discovery response also carries the gateway-authoritative `failover` fact: `true` means a failed attempt can be retried on another lane automatically. `false` means no automatic fallback is available today. Consume this field directly and never infer it from the number of lanes. Failed attempts are never billed either way.
 
 ## 6. Docs
