@@ -107,6 +107,8 @@ Before choosing an HTTP client timeout or MCP tool deadline, inspect the selecte
 
 `latency` is `null` when no successful observations are available or metrics could not be read. A p99 is an observation, not a maximum or a recommended timeout. If `excludesCallerDelay` is true, your wall-clock time also includes whatever waiting the request asks for.
 
+You can also ask routing to favour a faster source instead of only reading the numbers. Every SKU accepts an optional `preferLatencyUnderMs` in the request body: sources whose published 30-day median is under your target serve first, the cheapest of those wins, and a request is never refused for being slow. Omit it and routing is unchanged, with the cheapest source serving. **Send it and you may pay more** - when the cheapest source misses your target, a faster and dearer one serves and you are charged its price. Call `quote_api` with and without the field to see that difference before you spend anything. It does nothing on a SKU with one source or with sources we have not timed, and on a paginated walk it applies to the first page only.
+
 ### SDKs - build AnyAPI into your app
 
 Use an official SDK when AnyAPI should become part of the product flow rather than an agent-only tool, and your app is written in TypeScript, JavaScript, Node, or Python. The SDKs are the recommended integration path for those languages: prefer them over hand-rolling HTTP. They give you a typed method per SKU, handle auth, and track the catalog because they are generated from the same `openapi.json`.
