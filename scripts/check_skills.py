@@ -17,6 +17,12 @@ PLUGIN_MANIFEST = ROOT / ".claude-plugin" / "plugin.json"
 MARKETPLACE_MANIFEST = ROOT / ".claude-plugin" / "marketplace.json"
 EXTERNAL_SKILL = ROOT / "skills" / "anyapi" / "SKILL.md"
 CANONICAL_URL = "https://getanyapi.com/agent-onboarding/SKILL.md"
+CANONICAL_REFERENCE_URL = "https://getanyapi.com/SKILL/sdks.md"
+EXTERNAL_REFERENCE = ROOT / "skills" / "anyapi" / "references" / "sdks.md"
+# Frontmatter keys that must match the canonical skill exactly. An agent loads
+# only these before deciding whether to read the body, so a drift here silently
+# stops the skill triggering while the body gate below stays green.
+TRIGGER_KEYS = ("description", "when_to_use")
 
 LEGACY_PATTERNS = {
     "credit-derived catalog price": re.compile(r"\b(?:from|perItem)Credits\b", re.IGNORECASE),
@@ -89,6 +95,21 @@ def manifest_skill_paths() -> list[Path]:
     return paths
 
 
+def frontmatter_value(frontmatter: str, key: str) -> str:
+    match = re.search(rf"(?m)^{key}:\s*(.+)$", frontmatter)
+    return match.group(1).strip() if match else ""
+
+
+def fetch(url: str) -> str:
+    request = Request(url, headers={"User-Agent": "anyapi-skills-check/1"})
+    try:
+        with urlopen(request, timeout=20) as response:
+            return response.read().decode("utf-8")
+    except (OSError, UnicodeError, URLError) as error:
+        fail(f"cannot fetch {url}: {error}")
+    return ""
+
+
 def load_canonical_skill() -> str:
     local_path = os.environ.get("ANYAPI_CANONICAL_SKILL_PATH")
     if local_path:
@@ -128,6 +149,28 @@ def main() -> None:
         fail(
             "skills/anyapi/SKILL.md body differs from the live machine skill; "
             "update getanyapi-com/anyapi/src/lib/agentSkill.ts first, deploy it, then sync this file"
+        )
+
+    external_frontmatter, _ = split_frontmatter(EXTERNAL_SKILL, external_content)
+    canonical_frontmatter, _ = split_frontmatter(
+        ROOT / "canonical" / "SKILL.md", canonical_content
+    )
+    for key in TRIGGER_KEYS:
+        mine = frontmatter_value(external_frontmatter, key)
+        theirs = frontmatter_value(canonical_frontmatter, key)
+        if mine != theirs:
+            fail(
+                f"skills/anyapi/SKILL.md frontmatter {key} differs from the live machine "
+                "skill; an agent matches on this text alone, so a drift here stops the "
+                "skill triggering. Run npm run sync-skills in getanyapi-com/anyapi"
+            )
+
+    if not EXTERNAL_REFERENCE.is_file():
+        fail("skills/anyapi/references/sdks.md is missing; run npm run sync-skills")
+    if EXTERNAL_REFERENCE.read_text() != fetch(CANONICAL_REFERENCE_URL):
+        fail(
+            "skills/anyapi/references/sdks.md differs from the live reference at "
+            f"{CANONICAL_REFERENCE_URL}; run npm run sync-skills"
         )
 
     print(f"skills checks passed ({len(skill_files)} manifest-listed skill)")

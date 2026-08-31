@@ -1,9 +1,13 @@
 {
   "name": "anyapi",
-  "owner": { "name": "AnyAPI", "email": "support@getanyapi.com", "url": "https://getanyapi.com" },
+  "owner": {
+    "name": "AnyAPI",
+    "email": "support@getanyapi.com",
+    "url": "https://getanyapi.com"
+  },
   "metadata": {
     "description": "Official AnyAPI plugin marketplace - agent access to hundreds of scraping and data APIs.",
-    "version": "0.1.1"
+    "version": "0.3.0"
   },
   "plugins": [
     {
