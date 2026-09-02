@@ -51,9 +51,24 @@ a chain that stops early costs only what it completed.
 
 Every direct API call uses a Bearer credential: an `aa_live_...` API key or an `aa_at_...` OAuth access token. Prefer the `ANYAPI_API_KEY` environment variable for applications and automation. The CLI also reads `~/.anyapi/config.json`.
 
+### Already have a human with an AnyAPI account? Sign in first
+
+**If the person who gave you this prompt asked you to log in, or told you they already have an
+AnyAPI account, run `anyapi login` before anything else** (install the CLI first, section 2):
+
+    npx -y anyapi-cli@latest login
+
+It starts the cross-device OAuth flow, opens the consent URL in their browser, and waits for
+approval. Their existing wallet balance funds your calls, with no key to paste and no secret in
+the conversation. Only fall through to the trial below if they decline or have no account.
+
+Do not mint a trial key for someone who already funded a wallet - the trial is a separate,
+capped balance, so their money would sit unspent while you run out of trial credit.
+
 ### Free trial key (self-serve, no account)
 
-If `ANYAPI_API_KEY` is not already set, mint yourself a **free trial key**. It carries a trial budget of about **$0.05 of requests**, creates no account, and **self-expires in 7 days** - if it is never upgraded it just expires; nothing lingers and nothing is owed.
+If `ANYAPI_API_KEY` is not already set and no account sign-in was requested, mint yourself a
+**free trial key**. It carries a trial budget of about **$0.05 of requests**, creates no account, and **self-expires in 7 days** - if it is never upgraded it just expires; nothing lingers and nothing is owed.
 
 Before minting, tell your human in one sentence what you are doing - for example: "I'm minting a free AnyAPI trial key (about $0.05 of requests, expires on its own in 7 days, no account created)." Then proceed. Do not wait for a reply, and never ask for an email.
 
