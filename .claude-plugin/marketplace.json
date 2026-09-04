@@ -6,14 +6,14 @@
     "url": "https://getanyapi.com"
   },
   "metadata": {
-    "description": "Official AnyAPI plugin marketplace - agent access to hundreds of scraping and data APIs.",
+    "description": "Official AnyAPI plugin marketplace - agent access to hundreds of live data APIs.",
     "version": "0.3.0"
   },
   "plugins": [
     {
       "name": "anyapi",
       "source": "./",
-      "description": "Hundreds of scraping and data APIs through one gateway: one key, USD pay-per-request, normalized schemas, automatic fallback."
+      "description": "Hundreds of live data APIs through one gateway: social media, search and SEO, maps and local business data, company and contact enrichment, e-commerce, and structured JSON from any public web page. One key, USD pay-per-request, normalized schemas, automatic failover."
     }
   ]
 }

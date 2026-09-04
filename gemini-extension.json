@@ -1,11 +1,11 @@
 {
   "name": "anyapi",
   "version": "0.3.0",
-  "description": "Hundreds of scraping and data APIs through one key: social media, search results, maps, and clean JSON from pages that block bots. USD pay-per-request, normalized schemas, automatic failover.",
+  "description": "Hundreds of live data APIs through one gateway: social media, search and SEO, maps and local business data, company and contact enrichment, e-commerce, and structured JSON from any public web page. One key, USD pay-per-request, normalized schemas, automatic failover.",
   "contextFileName": "skills/anyapi/SKILL.md",
   "mcpServers": {
     "anyapi": {
-      "description": "Discover, quote, and run hundreds of scraping and data APIs through one AnyAPI key and one USD wallet.",
+      "description": "Discover, quote, and run hundreds of live data APIs through one AnyAPI key and one USD wallet.",
       "httpUrl": "https://api.getanyapi.com/mcp",
       "headers": {
         "Authorization": "Bearer $ANYAPI_API_KEY"

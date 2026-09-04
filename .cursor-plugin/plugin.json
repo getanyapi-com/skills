@@ -1,0 +1,43 @@
+{
+  "name": "anyapi",
+  "displayName": "AnyAPI",
+  "version": "0.3.0",
+  "description": "Hundreds of live data APIs through one gateway: social media, search and SEO, maps and local business data, company and contact enrichment, e-commerce, and structured JSON from any public web page. One key, one USD wallet, pay per request with no subscription, normalized input and output schemas, and automatic failover across sources under one price.",
+  "author": {
+    "name": "AnyAPI",
+    "email": "support@getanyapi.com"
+  },
+  "publisher": "AnyAPI",
+  "homepage": "https://getanyapi.com",
+  "repository": "https://github.com/getanyapi-com/skills",
+  "license": "Apache-2.0",
+  "logo": "assets/logo.png",
+  "category": "data-analytics",
+  "keywords": [
+    "anyapi",
+    "any api",
+    "getanyapi",
+    "anyapi mcp"
+  ],
+  "tags": [
+    "data",
+    "social-media",
+    "search",
+    "seo",
+    "enrichment",
+    "maps"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "variables": {
+    "type": "object",
+    "properties": {
+      "ANYAPI_API_KEY": {
+        "type": "string",
+        "title": "AnyAPI API key",
+        "description": "Your AnyAPI key (starts with aa_live_). Create one at https://getanyapi.com/dashboard - new accounts start with free credit."
+      }
+    },
+    "required": ["ANYAPI_API_KEY"]
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "anyapi",
-  "description": "Hundreds of scraping and data APIs through one gateway: one key, USD pay-per-request, normalized schemas, automatic fallback. Bundles the AnyAPI skills and MCP server.",
+  "description": "Hundreds of live data APIs through one gateway: social media, search and SEO, maps and local business data, company and contact enrichment, e-commerce, and structured JSON from any public web page. One key, USD pay-per-request, normalized schemas, automatic failover.",
   "version": "0.3.0",
   "author": {
     "name": "AnyAPI",
@@ -11,11 +11,13 @@
   "repository": "https://github.com/getanyapi-com/skills",
   "license": "Apache-2.0",
   "keywords": [
-    "scraping",
     "data",
-    "api",
     "social-media",
     "search",
+    "seo",
+    "enrichment",
+    "maps",
+    "ecommerce",
     "mcp"
   ],
   "skills": [
