@@ -7,7 +7,7 @@ argument-hint: [what data you need]
 allowed-tools: Bash(anyapi search:*) Bash(anyapi list:*) Bash(anyapi describe:*) Bash(anyapi view:*) Bash(anyapi balance:*)
 metadata:
   author: AnyAPI
-  version: "0.3.0"
+  version: "0.3.1"
 ---
 
 # AnyAPI - agent onboarding
@@ -116,7 +116,7 @@ Command cheat sheet:
     anyapi signup [--label]
     anyapi login   (cross-device OAuth account sign-in)
     anyapi login --api-key aa_live_...
-    anyapi search <query>
+    anyapi search [query] [--category] [--platform]
     anyapi list [--category]
     anyapi describe <sku>
     anyapi run <sku> --input '<json>' [--jq <expr>] [--fields a,b] [--max-items N] [--summary] [-o path] [--json]
@@ -140,7 +140,7 @@ Connect any MCP client to the streamable HTTP endpoint:
 Hosted OAuth is the primary connection. For non-OAuth clients, authenticate with `Authorization: Bearer aa_live_...`. Tools exposed:
 
 - `list_apis` - browse APIs, optionally filtered by `category`. Returns identity, nested USD pricing, and `failover`; descriptions, lanes, health, and schemas are omitted.
-- `search_apis` - ranked search across name, slug, and description. Requires `query`; optional `category`, `platform`, and `limit`. Adds descriptions and relevance to the list fields; lanes, health, and schemas are omitted.
+- `search_apis` - ranked search across name, slug, and description. Takes any non-empty combination of `query`, `category`, and `platform`, so a scope with no query is a complete search; optional `limit`. Adds descriptions and relevance to the list fields; lanes, health, and schemas are omitted.
 - `get_api` - full definition of one API, including nested USD pricing, anonymous lanes, normalized input/output JSON Schema, and nullable trailing-30-day latency p50/p95/p99 with its successful sample count. Args: `sku_id`.
 - `quote_api` - price a `run_api` call before running it. Free, no key required, nothing charged or executed; also validates your input against the schema. Args: `sku_id`, `input` (the same you would pass `run_api`). Returns `maxCostUsd`, `minCostUsd`, and the base/per-item breakdown.
 - `run_api` - execute an API. Args: `sku_id`, `input` (object matching the input schema). Ordinary APIs return `output`, `provider` ("AnyAPI"), `costUsd`, `items`, and `resultId`. A durable API waits briefly, then may return `requestId`, `status`, and a machine-actionable `nextAction`; follow it instead of repeating the paid call. Supports the context-budget controls in section 4.
