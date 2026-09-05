@@ -1,8 +1,9 @@
 # AnyAPI agent skills
 
 Official [Agent Skills](https://agentskills.io) for [AnyAPI](https://getanyapi.com) -
-hundreds of scraping and data APIs through one gateway: **one key, USD pay-per-request,
-normalized schemas, automatic fallback.**
+hundreds of live data APIs through one gateway - social media, search and SEO, maps,
+enrichment, e-commerce, and clean JSON from any public web page: **one key, USD
+pay-per-request, normalized schemas, automatic fallback.**
 
 The skills teach your agent the AnyAPI workflow (discover -> inspect -> run, cost
 discipline, error handling); the bundled [MCP server](https://getanyapi.com/docs/mcp-server)
