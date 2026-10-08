@@ -63,5 +63,6 @@ Application-integration guidance is part of the canonical `anyapi` skill; there 
 
 ## Docs
 
+- [Privacy](https://getanyapi.com/privacy)
 - [getanyapi.com/docs](https://getanyapi.com/docs) - quickstart, MCP server, API reference
 - [api.getanyapi.com/openapi.json](https://api.getanyapi.com/openapi.json) - machine-readable spec
