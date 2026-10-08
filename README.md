@@ -52,6 +52,12 @@ variable:
 export ANYAPI_API_KEY=...
 ```
 
+### Authentication
+
+`ANYAPI_API_KEY` is an AnyAPI-issued credential. The MCP configurations and REST/SDK examples
+send it only to `api.getanyapi.com` to authenticate AnyAPI requests. They do not read or send
+credentials for unrelated services.
+
 ## Skills
 
 | Skill | What it does |
