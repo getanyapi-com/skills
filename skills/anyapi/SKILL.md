@@ -12,7 +12,7 @@ metadata:
 
 # AnyAPI - agent onboarding
 
-AnyAPI is a unified marketplace for scraping and data APIs: **any API, one wallet, USD, no subscriptions.** You reach 473 APIs through one interface and one key, pay per request in real dollars, and AnyAPI normalizes schemas and fails over automatically on error. Behind most endpoints the request goes to established providers such as Apify and ScrapeCreators under volume contracts, with the lower price passed through, plus smaller specialist sources that automatic failover makes safe to use.
+AnyAPI is a unified marketplace for scraping and data APIs: **any API, one wallet, USD, no subscriptions.** You reach 476 APIs through one interface and one key, pay per request in real dollars, and AnyAPI normalizes schemas and fails over automatically on error. Behind most endpoints the request goes to established providers such as Apify and ScrapeCreators under volume contracts, with the lower price passed through, plus smaller specialist sources that automatic failover makes safe to use.
 
 **Setting AnyAPI up from a chat app with no shell (Grok, ChatGPT, Claude.ai)?** Follow https://getanyapi.com/agent-quickstart.md instead: it connects the MCP server and signs the person in.
 
@@ -145,7 +145,7 @@ Hosted OAuth is the primary connection. For non-OAuth clients, authenticate with
 - `search_apis` - ranked search across name, slug, and description. Takes any non-empty combination of `query`, `category`, and `platform`, so a scope with no query is a complete search; optional `limit`. Adds descriptions and relevance to the list fields; lanes, health, and schemas are omitted.
 - `get_api` - full definition of one API, including nested USD pricing, anonymous lanes, normalized input/output JSON Schema, and nullable trailing-30-day latency p50/p95/p99 with its successful sample count. Args: `sku_id`.
 - `quote_api` - price a `run_api` call before running it. Free, no key required, nothing charged or executed; also validates your input against the schema. Args: `sku_id`, `input` (the same you would pass `run_api`). Returns `maxCostUsd`, `minCostUsd`, and the base/per-item breakdown.
-- `run_api` - execute an API. Args: `sku_id`, `input` (object matching the input schema). Ordinary APIs return `output`, `provider` ("AnyAPI"), `costUsd`, `items`, and `resultId`. A durable API waits briefly, then may return `requestId`, `status`, and a machine-actionable `nextAction`; follow it instead of repeating the paid call. Supports the context-budget controls in section 4.
+- `run_api` - execute an API. Args: `sku_id`, `input` (object matching the input schema). Ordinary APIs return `output`, `provider` ("AnyAPI"), `costUsd`, `items`, and `resultId`. A durable API waits briefly, then may return `requestId`, `status`, and a machine-actionable `nextAction`; follow it instead of repeating the paid call. A lookup already charged also returns `costUsd`, a keyless `collectUrl`, and a `note`. Supports the context-budget controls in section 4.
 - `get_request` - inspect/resume a durable request without repeating or re-paying for the provider dispatch. Args: `request_id`. Poll after `retryAfterSeconds` while queued/running.
 - `read_result` - re-read a prior run's result for free. Args: `result_id` plus the same section 4 controls. Unbilled, ~15 min window.
 - `get_balance` - remaining wallet balance in USD for your key.
