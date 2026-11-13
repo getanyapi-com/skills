@@ -12,7 +12,7 @@ metadata:
 
 # AnyAPI - agent onboarding
 
-AnyAPI is a unified marketplace for scraping and data APIs: **any API, one wallet, USD, no subscriptions.** You reach 476 APIs through one interface and one key, pay per request in real dollars, and AnyAPI normalizes schemas and fails over automatically on error. Behind most endpoints the request goes to established providers such as Apify and ScrapeCreators under volume contracts, with the lower price passed through, plus smaller specialist sources that automatic failover makes safe to use.
+AnyAPI is a unified marketplace for scraping and data APIs: **any API, one wallet, USD, no subscriptions.** You reach 491 APIs through one interface and one key, pay per request in real dollars, and AnyAPI normalizes schemas and fails over automatically on error. Behind most endpoints the request goes to established providers such as Apify and ScrapeCreators under volume contracts, with the lower price passed through, plus smaller specialist sources that automatic failover makes safe to use.
 
 **Setting AnyAPI up from a chat app with no shell (Grok, ChatGPT, Claude.ai)?** Follow https://getanyapi.com/agent-quickstart.md instead: it connects the MCP server and signs the person in.
 
@@ -159,6 +159,10 @@ Before choosing an HTTP client timeout or MCP tool deadline, inspect the selecte
 `latency` is `null` when no successful observations are available or metrics could not be read. A p99 is an observation, not a maximum or a recommended timeout. If `excludesCallerDelay` is true, your wall-clock time also includes whatever waiting the request asks for.
 
 You can also ask routing to favour a faster source instead of only reading the numbers. Every SKU accepts an optional `preferLatencyUnderMs` in the request body: sources whose published 30-day median is under your target serve first, the cheapest of those wins, and a request is never refused for being slow. Omit it and routing is unchanged, with the cheapest source serving. **Send it and you may pay more** - when the cheapest source misses your target, a faster and dearer one serves and you are charged its price. Call `quote_api` with and without the field to see that difference before you spend anything. It does nothing on a SKU with one source or with sources we have not timed, and on a paginated walk it applies to the first page only.
+
+### Sources and cost
+
+Leave `source` and `allowFallbacks` out and let routing choose. Routing uses cheaper sources as they are added, and fails over to another source when one fails, so your requests are not tied to the uptime of one source. Pinning a single source and setting `allowFallbacks: false` are experimental (their behavior may change) and not recommended: when that source has an outage your requests fail while unpinned ones are served. **To control cost, set a price ceiling instead.** On a REST run paid from your wallet, add `?max_cost_usd=0.05`; on MCP, pass `max_cost_usd: 0.05` to `run_api`. Any source that would charge more is skipped, and if none is left the request is refused with no charge. x402 and MPP payments take no ceiling; call `quote_api` first to see the price.
 
 ### Building AnyAPI into an application
 
