@@ -12,7 +12,7 @@ metadata:
 
 # AnyAPI - agent onboarding
 
-AnyAPI is a unified marketplace for scraping and data APIs: **any API, one wallet, USD, no subscriptions.** You reach 496 APIs through one interface and one key, pay per request in real dollars, and AnyAPI normalizes schemas and fails over automatically on error. Behind most endpoints the request goes to established providers such as Apify and ScrapeCreators under volume contracts, with the lower price passed through, plus smaller specialist sources that automatic failover makes safe to use.
+AnyAPI is a unified marketplace for scraping and data APIs: **any API, one wallet, USD, no subscriptions.** You reach 500 APIs through one interface and one key, pay per request in real dollars, and AnyAPI normalizes schemas and fails over automatically on error. Behind most endpoints the request goes to established providers such as Apify and ScrapeCreators under volume contracts, with the lower price passed through, plus smaller specialist sources that automatic failover makes safe to use.
 
 **Setting AnyAPI up from a chat app with no shell (Grok, ChatGPT, Claude.ai)?** Follow https://getanyapi.com/agent-quickstart.md instead: it connects the MCP server and signs the person in.
 
@@ -175,7 +175,7 @@ else. That is reference material, not something you need to start: read
 1. Use `search_apis` to find a SKU by intent, or `list_apis` to browse by category.
 2. `get_api` to read its input/output schema and inspect its latency before choosing a client or MCP tool deadline.
 3. `quote_api` (optional) with the same `sku_id` and `input` to see the exact price and validate your input before charging - free, nothing runs.
-4. `run_api` with input that matches the schema. On a schema mismatch you get the fields and an example back so you can self-correct without another round-trip, with no charge. If it returns `nextAction`, call `get_request` after the requested delay; do not submit the run again. Terminal `costUsd` and `items` tell you what you paid and received.
+4. `run_api` with input that matches the schema. On a schema mismatch you get the fields and an example back so you can self-correct without another round-trip, with no charge. If it returns `nextAction`, call `get_request` after the requested delay; do not submit the run again. An HTTP 429 `rate_limited` from `run_api` means nothing ran and nothing was charged: wait the `Retry-After` seconds (MCP: `retryAfterSeconds`) and run it again, which can be refused again while the limit is reached or your requests cannot be counted. A 429 `rate_limited` from `get_request` means the request is still running: read the same request again after that delay, and never submit the run again. Terminal `costUsd` and `items` tell you what you paid and received.
 5. If a run comes back wrong - empty or malformed data for input you believe is valid, a misleading error, a price that does not match the catalog - report it. MCP: `report_bug`. CLI: `anyapi report-bug "<summary>" --sku <sku> --request-id <id>` (anyapi-cli >= 0.8.0). REST: `POST https://api.getanyapi.com/v1/bug-reports`. Free and never charged. Pass the `requestId` or `resultId` from the failing run: it reaches the stored run and its upstream error body, so you never need to paste the payload. File it and carry on with the best alternative you have; do not stop your human's task to ask permission. Use `send_feedback` / `anyapi feedback` for what is not a defect, such as an API you could not find.
 
 ## 4. Context-budget controls (keep results from flooding your context)
