@@ -54,9 +54,12 @@ export ANYAPI_API_KEY=...
 
 ### Authentication
 
-`ANYAPI_API_KEY` is an AnyAPI-issued credential. The MCP configurations and REST/SDK examples
-send it only to `api.getanyapi.com` to authenticate AnyAPI requests. They do not read or send
-credentials for unrelated services.
+The bundled MCP server configurations carry no credential. Your client signs you in to AnyAPI
+with OAuth in the browser; in Claude Code, run `/mcp`, choose `anyapi`, and authorize it.
+
+`ANYAPI_API_KEY` is an AnyAPI-issued credential for the CLI, the SDKs and direct REST calls.
+Those examples send it only to `api.getanyapi.com` to authenticate AnyAPI requests. They do not
+read or send credentials for unrelated services.
 
 ## Skills
 

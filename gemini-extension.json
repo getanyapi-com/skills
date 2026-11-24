@@ -1,22 +1,12 @@
 {
   "name": "anyapi",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Hundreds of live data APIs through one gateway: social media, search and SEO, maps and local business data, company and contact enrichment, e-commerce, and structured JSON from any public web page. One key, USD pay-per-request, normalized schemas, automatic failover.",
   "contextFileName": "skills/anyapi/SKILL.md",
   "mcpServers": {
     "anyapi": {
       "description": "Discover, quote, and run hundreds of live data APIs through one AnyAPI key and one USD wallet.",
-      "httpUrl": "https://api.getanyapi.com/mcp",
-      "headers": {
-        "Authorization": "Bearer $ANYAPI_API_KEY"
-      }
+      "httpUrl": "https://api.getanyapi.com/mcp"
     }
-  },
-  "settings": [
-    {
-      "name": "AnyAPI API key",
-      "description": "Your AnyAPI key (aa_live_...). Create one at https://getanyapi.com/dashboard/keys",
-      "envVar": "ANYAPI_API_KEY"
-    }
-  ]
+  }
 }
