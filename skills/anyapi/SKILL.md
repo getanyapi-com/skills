@@ -12,7 +12,7 @@ metadata:
 
 # AnyAPI - agent onboarding
 
-AnyAPI is a unified marketplace for scraping and data APIs: **any API, one wallet, USD, no subscriptions.** You reach 500 APIs through one interface and one key, pay per request in real dollars, and AnyAPI normalizes schemas and fails over automatically on error. Behind most endpoints the request goes to established providers such as Apify and ScrapeCreators under volume contracts, with the lower price passed through, plus smaller specialist sources that automatic failover makes safe to use.
+AnyAPI is a unified marketplace for scraping and data APIs: **any API, one wallet, USD, no subscriptions.** You reach 502 APIs through one interface and one key, pay per request in real dollars, and AnyAPI normalizes schemas and fails over automatically on error. Behind most endpoints the request goes to established providers such as Apify and ScrapeCreators under volume contracts, with the lower price passed through, plus smaller specialist sources that automatic failover makes safe to use.
 
 **Setting AnyAPI up from a chat app with no shell (Grok, ChatGPT, Claude.ai)?** Follow https://getanyapi.com/agent-quickstart.md instead: it connects the MCP server and signs the person in.
 
