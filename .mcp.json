@@ -2,10 +2,7 @@
   "mcpServers": {
     "anyapi": {
       "type": "http",
-      "url": "https://api.getanyapi.com/mcp",
-      "headers": {
-        "Authorization": "Bearer ${ANYAPI_API_KEY}"
-      }
+      "url": "https://api.getanyapi.com/mcp"
     }
   }
 }
