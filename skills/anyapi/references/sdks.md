@@ -21,11 +21,11 @@ Build workflow, either language:
 5. Handle HTTP 402 `trial_cap_reached` (the trial budget is spent) by surfacing the upgrade link from the error body to the human; anything that ships should run on a dashboard key.
 6. Smoke-test one cheap call and verify the response shape, `provider: "AnyAPI"`, and `costUsd`.
 
-TypeScript SDK example (reads `ANYAPI_API_KEY` from the environment):
+TypeScript SDK example (`new AnyAPI()` reads `ANYAPI_API_KEY` from the environment):
 
     import { AnyAPI } from "@getanyapi/sdk";
 
-    const client = new AnyAPI({ apiKey: process.env.ANYAPI_API_KEY });
+    const client = new AnyAPI();
 
     const res = await client.google.search({ query: "best coffee maker" });
     console.log(res.output, res.costUsd);
@@ -42,7 +42,7 @@ Python SDK example (`AnyAPI()` reads `ANYAPI_API_KEY` from the environment):
 
 An `AsyncAnyAPI` variant offers the same methods with `await`. Input keyword arguments mirror the wire API; output attributes are snake_case (`res.cost_usd`).
 
-**Fallback - raw REST fetch** (other languages, or when you want zero dependencies). Mint the key as above, then call `POST https://api.getanyapi.com/v1/run/{sku}` directly:
+**Fallback - raw REST fetch** (other languages, or when you want zero dependencies). Mint the key as above, load it from your app's configuration, and pass it in. Then call `POST https://api.getanyapi.com/v1/run/{sku}` directly:
 
     type RunResponse<TOutput> = {
       output: TOutput;
@@ -54,11 +54,11 @@ An `AsyncAnyAPI` variant offers the same methods with `await`. Input keyword arg
     };
 
     export async function runAnyApi<TOutput>(
+      apiKey: string,
       sku: string,
       input: Record<string, unknown>,
     ): Promise<RunResponse<TOutput>> {
-      const apiKey = process.env.ANYAPI_API_KEY;
-      if (!apiKey) throw new Error("Missing ANYAPI_API_KEY");
+      if (!apiKey) throw new Error("Missing AnyAPI key");
 
       const res = await fetch(
         "https://api.getanyapi.com/v1/run/" + encodeURIComponent(sku),

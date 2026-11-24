@@ -1,6 +1,6 @@
 {
   "name": "anyapi",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Hundreds of live data APIs through one gateway: social media, search and SEO, maps and local business data, company and contact enrichment, e-commerce, and structured JSON from any public web page. One key, USD pay-per-request, normalized schemas, automatic failover.",
   "contextFileName": "skills/anyapi/SKILL.md",
   "mcpServers": {
